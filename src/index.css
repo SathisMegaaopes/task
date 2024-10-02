@@ -1,10 +1,7 @@
 * {
   box-sizing: border-box;
   padding: 0;
-  /* max-width: 1850px; */
 }
-
-
 
 body {
   margin: 0;
@@ -24,10 +21,8 @@ a:hover {
 }
 
 
-
-
  @media (min-width: 1200px) {
   .css-5c1adp-MuiContainer-root {
-      max-width: none !important; /* Override max-width */
+      max-width: none !important; 
   }
 }
