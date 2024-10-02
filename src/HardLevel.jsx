@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardMedia } from '@mui/material';
+import { Card, CardMedia, CircularProgress, Grid2, Skeleton, Typography } from '@mui/material';
 import axios from 'axios';
 
 const HardLevel = () => {
@@ -7,13 +7,14 @@ const HardLevel = () => {
     const [loading, setLoading] = useState(false);
     const observer = useRef(null);
 
+    const error = false;
+
     const fetchImages = async (pageNumber = 1) => {
         setLoading(true);
         try {
             const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=5&page=${pageNumber}&order=Desc`);
             if (loading) {
                 setTimeout(() => {
-                    console.log('This is now working dude....')
                     setImages((prevImages) => [...prevImages, ...response.data]);
                 }, 3000);
             } else {
@@ -26,14 +27,17 @@ const HardLevel = () => {
         }
     };
 
+
     useEffect(() => {
+
         fetchImages();
+
     }, []);
 
     const handleObserver = (entries) => {
         const target = entries[0];
         if (target.isIntersecting && !loading) {
-            const nextPage = Math.floor(images.length / 5) + 1; // Calculate next page based on images count
+            const nextPage = Math.floor(images.length / 5) + 1; 
             fetchImages(nextPage);
         }
     };
@@ -54,32 +58,51 @@ const HardLevel = () => {
                 currentObserver.disconnect();
             }
         };
-    }, [images]); // Add images as dependency to reinitialize observer
+    }, [images]);
 
     return (
         <div>
-            {images.map((image, index) => (
-                <Card key={index} style={{ height: '400px', width: '97vw', margin: '10px auto' }}>
-                    <CardMedia
-                        component="img"
-                        image={image.url}
-                        alt={`cat-${index}`}
-                        style={{ height: '100%', objectFit: 'cover' }}
-                    />
-                </Card>
-            ))}
-            {/* Loading Image Card */}
+            <Grid2 container spacing={2} justifyContent="center" alignItems="center" >
+                {loading ? (
+                    Array.from(new Array(5)).map((_, index) => (
+                        <Grid2 key={index} sx={{ p: 0 }}>
+                            <Skeleton width={'97vw'} height={'400px'} sx={{ marginTop: '-80px' }} />
+                        </Grid2>
+                    ))
+                ) : error ? (
+                    <Grid2 item>
+                        <Typography color="error">{error}</Typography>
+                    </Grid2>
+                ) : images.length === 0 ? (
+                    <Grid2 item>
+                        <Typography>No data available.</Typography>
+                    </Grid2>
+                ) : (
+                    <Grid2 container spacing={3}>
+                        {images.map((image, index) => (
+                            <Grid2 item xs={6} key={index}>
+                                <Card key={index} style={{ height: '300px', width: '97vw', margin: '10px auto' }}>
+                                    <CardMedia
+                                        component="img"
+                                        image={image.url}
+                                        alt={`cat-${index}`}
+                                        style={{ height: '100%', objectFit: 'cover' }}
+                                    />
+                                </Card>
+                            </Grid2>
+                        ))}
+                    </Grid2>
+                )}
+            </Grid2>
+
             {loading && (
-                <Card style={{ height: '400px', width: '97vw', margin: '10px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <img
-                        src="https://www.google.com/url?sa=i&url=https%3A%2F%2Ftenor.com%2Fview%2Floading-buffering-spinning-waiting-gif-17313179&psig=AOvVaw29tEwi52_cHFy2wqGF4AZh&ust=1727940925861000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCLD_j9uX74gDFQAAAAAdAAAAABAE" // Replace with your loading image URL
-                        alt="Loading"
-                        style={{ width: '50px', height: '50px' }} // Adjust size as needed
-                    />
-                </Card>
+                <Grid2 container justifyContent="center" alignItems="center" style={{ height: '400px' }}>
+                    <CircularProgress />
+                </Grid2>
             )}
+
             <div id="scroll-anchor" style={{ height: '1px' }}></div>
-        </div>
+        </div >
     );
 };
 
@@ -89,107 +112,363 @@ export default HardLevel;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useEffect, useRef } from 'react';
-// import { Card, CardMedia, Grid2, Typography } from '@mui/material';
-// import { useQuery } from '@tanstack/react-query';
+// import React, { useState, useEffect, useRef } from 'react';
+// import { Card, CardMedia, CircularProgress, Grid2, Skeleton, Typography, Button } from '@mui/material';
 // import axios from 'axios';
 
-// const fetchImages = async (page) => {
-//     const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=5&page=${page}&order=Desc`);
-//     return response.data;
-// };
-
 // const HardLevel = () => {
-//     const [page, setPage] = React.useState(1);
-//     const observer = useRef(null);
+//     const [images, setImages] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [isLoadingMore, setIsLoadingMore] = useState(false); // Separate loading state for Load More
+//     const [hasMore, setHasMore] = useState(true);
 
-//     const { data: images, isLoading, isError } = useQuery(['images', page], () => fetchImages(page), {
-//         keepPreviousData: true, // Keep previous data while fetching new data
-//     });
+//     const fetchImages = async (pageNumber = 1, isLoadMore = false) => {
+//         if (isLoadMore) setIsLoadingMore(true);
+//         else setLoading(true);
 
-//     const handleObserver = (entries) => {
-//         const target = entries[0];
-//         if (target.isIntersecting) {
-//             setPage((prevPage) => prevPage + 1);
+//         try {
+//             const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=5&page=${pageNumber}&order=Desc`);
+//             if (response.data.length > 0) {
+//                 setImages((prevImages) => [...prevImages, ...response.data]);
+//             } else {
+//                 setHasMore(false); // No more images to load
+//             }
+//         } catch (err) {
+//             console.error('Failed to fetch data', err);
+//         } finally {
+//             if (isLoadMore) setIsLoadingMore(false);
+//             else setLoading(false);
 //         }
 //     };
 
 //     useEffect(() => {
-//         const options = {
-//             root: null,
-//             rootMargin: '20px',
-//             threshold: 1.0,
-//         };
-//         observer.current = new IntersectionObserver(handleObserver, options);
-//         const currentObserver = observer.current;
-//         if (currentObserver) {
-//             currentObserver.observe(document.querySelector('#scroll-anchor'));
-//         }
-//         return () => {
-//             if (currentObserver) {
-//                 currentObserver.disconnect();
-//             }
-//         };
+//         fetchImages(); // Initial fetch
 //     }, []);
 
+//     const loadMoreImages = () => {
+//         const nextPage = Math.floor(images.length / 5) + 1; // Calculate the next page
+//         fetchImages(nextPage, true); // Fetch next page images, set isLoadMore to true
+//     };
+
 //     return (
-//         <div style={{ textAlign: 'center' }}>
-//             <Grid2 container spacing={3}>
-//                 {images && images.map((image, index) => (
-//                     <Grid2 item xs={12} key={index}>
-//                         <Card style={{ height: '400px', width: '97vw' }}>
-//                             <CardMedia
-//                                 component="img"
-//                                 image={image.url}
-//                                 alt={`cat-${index}`}
-//                                 style={{ height: '100%', objectFit: 'cover' }}
+//         <div>
+//             <Grid2 container spacing={2} justifyContent="center" alignItems="center">
+//                 {loading && (
+//                     Array.from(new Array(5)).map((_, index) => (
+//                         <Grid2 item xs={12} sm={6} md={4} key={index} sx={{ p: 1 }}>
+//                             <Skeleton
+//                                 width={'100%'}
+//                                 height={'300px'}
+//                                 sx={{ marginBottom: '20px' }}
 //                             />
-//                         </Card>
+//                         </Grid2>
+//                     ))
+//                 )}
+
+//                 {!loading && images.length === 0 && (
+//                     <Grid2 item>
+//                         <Typography>No data available.</Typography>
 //                     </Grid2>
-//                 ))}
+//                 )}
+
+//                 <Grid2 container spacing={3}>
+//                     {images.map((image, index) => (
+//                         <Grid2 item xs={12} sm={6} md={4} key={index}>
+//                             <Card
+//                                 style={{
+//                                     height: '300px',
+//                                     width: '100%',
+//                                     margin: '10px auto'
+//                                 }}
+//                             >
+//                                 <CardMedia
+//                                     component="img"
+//                                     image={image.url}
+//                                     alt={`cat-${index}`}
+//                                     style={{ height: '100%', objectFit: 'cover' }}
+//                                 />
+//                             </Card>
+//                         </Grid2>
+//                     ))}
+//                 </Grid2>
 //             </Grid2>
+
+//             {/* Load More Button with CircularProgress */}
+//             {!loading && hasMore && (
+//                 <Grid2 container justifyContent="center" style={{ margin: '20px 0' }}>
+//                     {isLoadingMore ? (
+//                         <CircularProgress />
+//                     ) : (
+//                         <Button
+//                             variant="contained"
+//                             onClick={loadMoreImages}
+//                             sx={{
+//                                 width: '200px',
+//                                 height: '50px',
+//                                 fontSize: '1rem'
+//                             }}
+//                         >
+//                             Load More
+//                         </Button>
+//                     )}
+//                 </Grid2>
+//             )}
+
+//             {/* Anchor for infinite scroll */}
 //             <div id="scroll-anchor" style={{ height: '1px' }}></div>
-
-//             {isLoading && (
-//                 <Typography style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-//                     Loading more images...
-//                 </Typography>
-//             )}
-
-//             {isError && (
-//                 <Typography style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'red' }}>
-//                     An error occurred while fetching images.
-//                 </Typography>
-//             )}
 //         </div>
 //     );
 // };
 
 // export default HardLevel;
+
+
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { Card, CardMedia, CircularProgress, Grid2, Skeleton, Typography, Button } from '@mui/material';
+// import axios from 'axios';
+
+// const HardLevel = () => {
+//     const [images, setImages] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [isLoadingMore, setIsLoadingMore] = useState(false); // Separate loading state for Load More
+//     const [hasMore, setHasMore] = useState(true);
+
+//     const fetchImages = async (pageNumber = 1, isLoadMore = false) => {
+//         if (isLoadMore) setIsLoadingMore(true);
+//         else setLoading(true);
+
+//         try {
+//             const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=5&page=${pageNumber}&order=Desc`);
+//             if (response.data.length > 0) {
+//                 setImages((prevImages) => [...prevImages, ...response.data]);
+//             } else {
+//                 setHasMore(false); // No more images to load
+//             }
+//         } catch (err) {
+//             console.error('Failed to fetch data', err);
+//         } finally {
+//             if (isLoadMore) setIsLoadingMore(false);
+//             else setLoading(false);
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchImages(); // Initial fetch
+//     }, []);
+
+//     const loadMoreImages = () => {
+//         const nextPage = Math.floor(images.length / 5) + 1; // Calculate the next page
+//         fetchImages(nextPage, true); // Fetch next page images, set isLoadMore to true
+//     };
+
+//     return (
+//         <div>
+//             <Grid2 container spacing={2} justifyContent="center" alignItems="center">
+//                 {loading && (
+//                     Array.from(new Array(5)).map((_, index) => (
+//                         <Grid2 item xs={12} sm={6} md={4} key={index} sx={{ p: 1 }}>
+//                             <Skeleton
+//                                 width={'100%'}
+//                                 height={'300px'}
+//                                 sx={{ marginBottom: '20px' }}
+//                             />
+//                         </Grid2>
+//                     ))
+//                 )}
+
+//                 {!loading && images.length === 0 && (
+//                     <Grid2 item>
+//                         <Typography>No data available.</Typography>
+//                     </Grid2>
+//                 )}
+
+//                 <Grid2 container spacing={3}>
+//                     {images.map((image, index) => (
+//                         <Grid2 item xs={12} sm={6} md={4} key={index}>
+//                             <Card
+//                                 sx={{
+//                                     height: '300px',
+//                                     width: '100%',
+//                                     margin: '10px auto',
+//                                     display: 'flex',
+//                                     justifyContent: 'center',
+//                                     alignItems: 'center'
+//                                 }}
+//                             >
+//                                 <CardMedia
+//                                     component="img"
+//                                     image={image.url}
+//                                     alt={`cat-${index}`}
+//                                     sx={{
+//                                         height: '100%',
+//                                         width: '100%',
+//                                         objectFit: 'cover'
+//                                     }}
+//                                 />
+//                             </Card>
+//                         </Grid2>
+//                     ))}
+//                 </Grid2>
+//             </Grid2>
+
+//             {/* Load More Button with CircularProgress */}
+//             {!loading && hasMore && (
+//                 <Grid2 container justifyContent="center" style={{ margin: '20px 0' }}>
+//                     {isLoadingMore ? (
+//                         <CircularProgress />
+//                     ) : (
+//                         <Button
+//                             variant="contained"
+//                             onClick={loadMoreImages}
+//                             sx={{
+//                                 width: '200px',
+//                                 height: '50px',
+//                                 fontSize: '1rem'
+//                             }}
+//                         >
+//                             Load More
+//                         </Button>
+//                     )}
+//                 </Grid2>
+//             )}
+
+//             {/* Anchor for infinite scroll */}
+//             <div id="scroll-anchor" style={{ height: '1px' }}></div>
+//         </div>
+//     );
+// };
+
+// export default HardLevel;
+
+
+
+
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { Card, CardMedia, CircularProgress, Grid2, Skeleton, Typography, Button } from '@mui/material';
+// import axios from 'axios';
+
+// const HardLevel = () => {
+//     const [images, setImages] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [isLoadingMore, setIsLoadingMore] = useState(false);
+//     const [hasMore, setHasMore] = useState(true);
+
+//     const fetchImages = async (pageNumber = 1, isLoadMore = false) => {
+//         if (isLoadMore) setIsLoadingMore(true);
+//         else setLoading(true);
+
+//         try {
+//             const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=5&page=${pageNumber}&order=Desc`);
+//             if (response.data.length > 0) {
+//                 setImages((prevImages) => [...prevImages, ...response.data]);
+//             } else {
+//                 setHasMore(false);
+//             }
+//         } catch (err) {
+//             console.error('Failed to fetch data', err);
+//         } finally {
+//             if (isLoadMore) {
+//                 setTimeout(() => {
+//                     setIsLoadingMore(false);
+//                 }, 3000);
+//             } else {
+//                 setLoading(false);
+//             }
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchImages();
+//     }, []);
+
+//     const loadMoreImages = () => {
+//         const nextPage = Math.floor(images.length / 5) + 1;
+//         fetchImages(nextPage, true);
+//     };
+
+//     return (
+//         <div>
+//             <Grid2 container spacing={2} justifyContent="center" alignItems="center">
+//                 {loading && (
+//                     Array.from(new Array(5)).map((_, index) => (
+//                         <Grid2 item key={index} sx={{ p: 0 }}>
+//                             <Skeleton width={'97vw'} height={'400px'} sx={{ marginTop: '-80px' }} />
+//                         </Grid2>
+//                     ))
+//                 )}
+
+//                 {!loading && images.length === 0 && (
+//                     <Grid2 item>
+//                         <Typography>No data available.</Typography>
+//                     </Grid2>
+//                 )}
+
+//                 <Grid2 container spacing={3}>
+//                     {images.map((image, index) => (
+//                         <Grid2 item xs={12} key={index}>
+//                             <Card style={{ height: '300px', width: '97vw', margin: '10px auto' }}>
+//                                 <CardMedia
+//                                     component="img"
+//                                     image={image.url}
+//                                     alt={`cat-${index}`}
+//                                     style={{ height: '100%', objectFit: 'cover' }}
+//                                 />
+//                             </Card>
+//                         </Grid2>
+//                     ))}
+//                 </Grid2>
+//             </Grid2>
+
+//             {!loading && hasMore && (
+//                 <Grid2 container justifyContent="center" style={{ margin: '20px 0' }}>
+//                     {isLoadingMore ? (
+//                         <CircularProgress />
+//                     ) : (
+//                         <Button variant="contained" onClick={loadMoreImages}>
+//                             Load More
+//                         </Button>
+//                     )}
+//                 </Grid2>
+//             )}
+
+//             <div id="scroll-anchor" style={{ height: '1px' }}></div>
+//         </div>
+//     );
+// };
+
+// export default HardLevel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

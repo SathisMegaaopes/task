@@ -24,34 +24,6 @@ const EasyLevel = () => {
     return (
 
 
-        // <>
-        //     <Button variant="contained" onClick={fetchImages} style={{ marginBottom: '20px' }}>
-        //         Fetch Images
-        //     </Button>
-        //     <div style={{ display:'flex',flexDirection:'row' ,  alignItems: 'center', justifyContent: 'center' , height:'100%' }}>
-
-        //         {loading && <Typography>Loading...</Typography>}
-        //         {error && <Typography>{error}</Typography>}
-        //         {!loading && images.length === 0 && !error && <Typography>No images available</Typography>}
-
-        //         <Grid2 container spacing={3}>
-        //             {images.map((image, index) => (
-        //                 <Grid2 item xs={12} key={index}>
-        //                     <Card style={{ height: '300px', width: '350px' }}>
-        //                         <CardMedia
-        //                             component="img"
-        //                             image={image.url}
-        //                             alt={`cat-${index}`}
-        //                             style={{ height: '100%', objectFit: 'cover' }}
-        //                         />
-        //                     </Card>
-        //                 </Grid2>
-        //             ))}
-        //         </Grid2>
-        //     </div>
-        // </>
-
-
         <div >
             <Grid2 container justifyContent="center" style={{ marginBottom: '20px' }}>
                 <Grid2 item>

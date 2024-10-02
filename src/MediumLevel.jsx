@@ -76,7 +76,7 @@ const MediumLevel = () => {
             </Grid2>
 
             {images.length !== 0 &&
-                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', paddingRight: '30px' }}>
+                <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', paddingRight: '30px' }}>
                     <Button variant="contained" onClick={handlePreviousPage} disabled={page === 1}>
                         Previous
                     </Button>
